@@ -12,7 +12,7 @@ use std::{
 #[derive(Clone)]
 pub struct Parser<'a> {
     tail: &'a str,
-    position: Position<'a>,
+    pub position: Position<'a>,
 }
 
 #[derive(Debug, Clone)]
@@ -153,7 +153,7 @@ pub struct Element<'a> {
 }
 
 impl<'a> Element<'a> {
-    pub fn get<'b, T: Query<'a, 'b>>(&'b self, name: &str) -> Result<'a, T> {
+    pub fn attribute<'b, T: Query<'a, 'b>>(&'b self, name: &str) -> Result<'a, T> {
         T::get(name, self)
     }
 
@@ -421,6 +421,12 @@ pub trait FromValue<'a, 'b>: Sized {
 impl<'a, 'b> FromValue<'a, 'b> for &'b str {
     fn from_value(value: &'b str, _position: &'b Position<'a>) -> Result<'a, Self> {
         Ok(value)
+    }
+}
+
+impl<'a, 'b> FromValue<'a, 'b> for String {
+    fn from_value(value: &'b str, _position: &'b Position<'a>) -> Result<'a, Self> {
+        Ok(value.to_string())
     }
 }
 
