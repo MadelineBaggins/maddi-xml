@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2025 Madeline Baggins <declanbaggins@gmail.com>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+[package]
+name = "maddi-xml"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "A "
+
+[dependencies]
