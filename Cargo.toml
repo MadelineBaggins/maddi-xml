@@ -7,6 +7,9 @@ name = "maddi-xml"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-description = "A "
+description = "A library for parsing xml config files for cli tools"
+repository = "https://github.com/MadelineBaggins/maddi-xml"
+readme = "README.md"
+keywords = [ "xml", "config", "parser", "cli", "parser" ]
 
 [dependencies]
