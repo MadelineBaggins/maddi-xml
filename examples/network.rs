@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 Madeline Baggins <declanbaggins@gmail.com>
+//
+// SPDX-License-Identifier: MIT
+
 use maddi_xml::{Content, Element, FromElement, FromValue, Parser, Result};
 use std::{net::Ipv4Addr, path::Path};
 
