@@ -4,7 +4,7 @@
 
 [package]
 name = "maddi-xml"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "MIT"
 description = "A library for parsing xml config files for cli tools"
