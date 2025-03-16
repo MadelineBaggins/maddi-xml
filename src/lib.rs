@@ -432,7 +432,7 @@ impl<'a, 'b> FromValue<'a, 'b> for &'b Path {
 
 impl<'a, 'b> FromValue<'a, 'b> for String {
     fn from_value(value: &'b str, _position: &'b Position<'a>) -> Result<'a, Self> {
-        Ok(value.to_string())
+        Ok(value.into())
     }
 }
 
@@ -482,7 +482,7 @@ where
                 IntErrorKind::Zero => "value cannot be zero for this attribute",
                 _ => "unknown integer parse error",
             }
-            .to_string();
+            .into();
             position.error(msg)
         })
     }
@@ -541,5 +541,19 @@ pub trait FromElement<'a, 'b>: Sized {
 impl<'a, 'b> FromElement<'a, 'b> for &'b Element<'a> {
     fn from_element(element: &'b Element<'a>) -> Result<'a, Self> {
         Ok(element)
+    }
+}
+
+impl<'a, 'b, T> FromElement<'a, 'b> for T
+where
+    T: FromValue<'a, 'b>,
+{
+    fn from_element(element: &'b Element<'a>) -> Result<'a, Self> {
+        match element.contents.as_slice() {
+            [Content::Text(value)] => T::from_value(value, &element.position),
+            _ => Err(element
+                .position
+                .error("expected element to contain a single value".into())),
+        }
     }
 }
