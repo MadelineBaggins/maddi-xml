@@ -5,7 +5,7 @@
 use std::{
     collections::HashMap,
     num::{IntErrorKind, ParseIntError},
-    path::Path,
+    path::{Path, PathBuf},
     str::FromStr,
 };
 
@@ -424,9 +424,21 @@ impl<'a, 'b> FromValue<'a, 'b> for &'b str {
     }
 }
 
+impl<'a, 'b> FromValue<'a, 'b> for &'b Path {
+    fn from_value(value: &'b str, _position: &'b Position<'a>) -> Result<'a, Self> {
+        Ok(value.as_ref())
+    }
+}
+
 impl<'a, 'b> FromValue<'a, 'b> for String {
     fn from_value(value: &'b str, _position: &'b Position<'a>) -> Result<'a, Self> {
         Ok(value.to_string())
+    }
+}
+
+impl<'a, 'b> FromValue<'a, 'b> for PathBuf {
+    fn from_value(value: &'b str, _position: &'b Position<'a>) -> Result<'a, Self> {
+        Ok(PathBuf::from(value))
     }
 }
 
