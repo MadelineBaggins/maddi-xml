@@ -170,6 +170,41 @@ impl<'a> Element<'a> {
             })
             .map(|t| T::from_element(t))
     }
+    pub fn child<'b, 'c, T: FromElement<'a, 'b>>(&'b self, name: &'c str) -> Result<'a, T> {
+        use Content;
+        let mut candidates = self.contents.iter().filter_map(move |item| match item {
+            Content::Element(e) if e.name == name => Some(e),
+            _ => None,
+        });
+        let Some(result) = candidates.next() else {
+            return Err(self.position.error(format!("expected '{name}' element")));
+        };
+        if let Some(duplicate) = candidates.next() {
+            return Err(duplicate
+                .position
+                .error(format!("duplicate '{name}' element")));
+        }
+        T::from_element(result)
+    }
+    pub fn optional_child<'b, 'c, T: FromElement<'a, 'b>>(
+        &'b self,
+        name: &'c str,
+    ) -> Result<'a, Option<T>> {
+        use Content;
+        let mut candidates = self.contents.iter().filter_map(move |item| match item {
+            Content::Element(e) if e.name == name => Some(e),
+            _ => None,
+        });
+        let Some(result) = candidates.next() else {
+            return Ok(None);
+        };
+        if let Some(duplicate) = candidates.next() {
+            return Err(duplicate
+                .position
+                .error(format!("duplicate '{name}' element")));
+        }
+        Some(T::from_element(result)).transpose()
+    }
 }
 
 impl<'a> Parse<'a> for Option<Result<'a, Element<'a>>> {
