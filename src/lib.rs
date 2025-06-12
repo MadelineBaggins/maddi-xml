@@ -3,10 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 use std::{
-    collections::HashMap,
-    num::{IntErrorKind, ParseIntError},
-    path::{Path, PathBuf},
-    str::FromStr,
+    borrow::Cow, collections::HashMap, num::{IntErrorKind, ParseIntError}, path::{Path, PathBuf}, str::FromStr
 };
 
 #[derive(Clone)]
@@ -451,6 +448,12 @@ impl<'a> Parse<'a> for Option<Result<'a, CloseTag<'a>>> {
 
 pub trait FromValue<'a, 'b>: Sized {
     fn from_value(value: &'b str, position: &'b Position<'a>) -> Result<'a, Self>;
+}
+
+impl<'a, 'b> FromValue<'a, 'b> for Cow<'b, str> {
+    fn from_value(value: &'b str, _position: &'b Position<'a>) -> Result<'a, Self> {
+        Ok(Cow::Borrowed(value))
+    }
 }
 
 impl<'a, 'b> FromValue<'a, 'b> for &'b str {
