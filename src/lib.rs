@@ -3,7 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 use std::{
-    borrow::Cow, collections::HashMap, num::{IntErrorKind, ParseIntError}, path::{Path, PathBuf}, str::FromStr
+    borrow::Cow,
+    collections::HashMap,
+    fs::File,
+    num::{IntErrorKind, ParseIntError},
+    path::{Path, PathBuf},
+    str::FromStr,
 };
 
 #[derive(Clone)]
@@ -593,5 +598,33 @@ where
                 .position
                 .error("expected element to contain a single value".into())),
         }
+    }
+}
+
+pub trait FromConfig
+where
+    Self: for<'a, 'b> FromElement<'a, 'b>,
+{
+    const ROOT: &'static str;
+    fn load(path: &Path) -> std::result::Result<Self, String> {
+        use std::io::Read;
+
+        let mut file =
+            File::open(path).map_err(|_| format!("could not open config: {}", path.display()))?;
+        let mut config = String::new();
+        file.read_to_string(&mut config)
+            .map_err(|_| format!("could not read config file: {}", path.display()))?;
+        let mut parser = Parser::new(path, &config);
+        let err = format!("expected root '<{}>' element", Self::ROOT);
+        let element = match parser.parse::<Option<Result<Content>>>() {
+            Some(Ok(Content::Element(e))) => {
+                if e.name != Self::ROOT {
+                    return Err(format!("{}", e.position.error(err)));
+                }
+                e
+            }
+            _ => return Err(format!("{}", parser.position.error(err))),
+        };
+        Self::from_element(&element).map_err(|e| format!("{e}"))
     }
 }
