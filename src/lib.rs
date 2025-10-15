@@ -623,6 +623,7 @@ where
                 }
                 e
             }
+            Some(Err(e)) => return Err(format!("{e}")),
             _ => return Err(format!("{}", parser.position.error(err))),
         };
         Self::from_element(&element).map_err(|e| format!("{e}"))
