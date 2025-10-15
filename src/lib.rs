@@ -238,7 +238,10 @@ impl<'a> Parse<'a> for Option<Result<'a, Element<'a>>> {
             match parser.parse::<Option<Result<Content>>>() {
                 Some(Err(err)) => return Some(Err(err)),
                 Some(Ok(content)) => contents.push(content),
-                None => return Some(Err(parser.position.error("missing closing tag".into()))),
+                None => {
+                    let err = format!("missing closing tag, expected: </{}>", open_tag.name);
+                    return Some(Err(parser.position.error(err)));
+                }
             }
         };
         // Ensure we didn't error getting the close tag
@@ -248,7 +251,8 @@ impl<'a> Parse<'a> for Option<Result<'a, Element<'a>>> {
         };
         // Ensure the close and open tags match
         if open_tag.name != close_tag.name {
-            return Some(Err(parser.position.error("mismatched closing tag".into())));
+            let err = format!("mismatched closing tag, expected: </{}>", open_tag.name);
+            return Some(Err(parser.position.error(err)));
         }
         Some(Ok(Element {
             name: open_tag.name,
